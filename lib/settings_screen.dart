@@ -56,6 +56,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
+        backgroundColor: themeProvider.themeData.appBarTheme.backgroundColor, // **Doğrudan ThemeProvider'dan al**
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -124,22 +125,22 @@ class SettingsScreenState extends State<SettingsScreen> {
 
   /// 🎨 Tema Seçim Diyaloğu
   void _showThemeDialog(BuildContext context, ThemeProvider themeProvider) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Select Theme'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: ['System', 'Light', 'Dark', 'Blue', 'Green']
-                .map((theme) => ListTile(
-                      title: Text(theme),
-                      onTap: () {
-                        themeProvider.setTheme(theme);
-                        Navigator.pop(context);
-                      },
-                    ))
-                .toList(),
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Select Theme'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: ['System', 'Light', 'Dark', 'Deep Blue', 'Neon Pink']
+              .map((theme) => ListTile(
+                    title: Text(theme),
+                    onTap: () {
+                      themeProvider.setTheme(theme);
+                      Navigator.pop(context);
+                    },
+                  ))
+              .toList(),
           ),
         );
       },

@@ -30,20 +30,37 @@ class ThemeProvider extends ChangeNotifier {
   void _updateTheme() {
     switch (_currentTheme) {
       case 'Dark':
-        _themeData = ThemeData.dark();
+       _themeData = ThemeData.dark().copyWith(
+          appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
+        );
         break;
       case 'Light':
-        _themeData = ThemeData.light();
+        _themeData = ThemeData.light().copyWith(
+          scaffoldBackgroundColor: Colors.white,
+          appBarTheme: const AppBarTheme(backgroundColor: Colors.white),
+        );
         break;
-      case 'Blue':
-        _themeData = ThemeData(primarySwatch: Colors.blue);
+      case 'Deep Blue':
+        _themeData = ThemeData(
+          brightness: Brightness.light,
+          primaryColor: const Color(0xFF1E3A5F), // Derin mavi tonu
+          scaffoldBackgroundColor: const Color(0xFF1E3A5F),
+          appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF1E3A5F)), // **Koyu mavi**
+        );
         break;
-      case 'Green':
-        _themeData = ThemeData(primarySwatch: Colors.green);
+      case 'Neon Pink':
+        _themeData = ThemeData(
+          brightness: Brightness.light,
+          primaryColor: const Color(0xFFFF007F), // Neon pembe
+          scaffoldBackgroundColor: const Color(0xFFFF007F),
+          appBarTheme: const AppBarTheme(backgroundColor: Color(0xFFFF007F)), // **Neon pembe**
+        );
         break;
       default:
         var brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
-        _themeData = brightness == Brightness.dark ? ThemeData.dark() : ThemeData.light();
+        _themeData = brightness == Brightness.dark
+            ? ThemeData.dark().copyWith(appBarTheme: const AppBarTheme(backgroundColor: Colors.black))
+            : ThemeData.light().copyWith(appBarTheme: const AppBarTheme(backgroundColor: Colors.white));
     }
   }
 }
