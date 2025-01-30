@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/scheduler.dart';
 
 class ThemeProvider extends ChangeNotifier {
   ThemeData _themeData = ThemeData.light();
-  String _currentTheme = 'Light';
+  String _currentTheme = 'System';
 
   ThemeData get themeData => _themeData;
   String get currentTheme => _currentTheme;
@@ -14,7 +15,7 @@ class ThemeProvider extends ChangeNotifier {
 
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    _currentTheme = prefs.getString('selectedTheme') ?? 'Light';
+    _currentTheme = prefs.getString('selectedTheme') ?? 'System';
     _updateTheme();
   }
 
@@ -23,13 +24,16 @@ class ThemeProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('selectedTheme', theme);
     _updateTheme();
-    notifyListeners(); // 🎯 Tema değiştiğini haber ver!
+    notifyListeners();
   }
 
   void _updateTheme() {
     switch (_currentTheme) {
       case 'Dark':
         _themeData = ThemeData.dark();
+        break;
+      case 'Light':
+        _themeData = ThemeData.light();
         break;
       case 'Blue':
         _themeData = ThemeData(primarySwatch: Colors.blue);
@@ -38,7 +42,8 @@ class ThemeProvider extends ChangeNotifier {
         _themeData = ThemeData(primarySwatch: Colors.green);
         break;
       default:
-        _themeData = ThemeData.light();
+        var brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
+        _themeData = brightness == Brightness.dark ? ThemeData.dark() : ThemeData.light();
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:xoplus/splash_screen.dart';
 import 'theme_provider.dart';
-import 'home_page.dart';
 
 void main() {
   runApp(
@@ -18,11 +18,16 @@ class XOPlusApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'XOPlus',
-      theme: themeProvider.themeData,
-      home: const HomePage(), // İlk açılışta HomePage olacak!
+    return AnimatedTheme(
+      data: themeProvider.themeData,
+      duration: const Duration(milliseconds: 500), // 🎨 Tema değişirken yumuşak geçiş
+      curve: Curves.easeInOut, // 🔄 Animasyonun nasıl olacağını belirliyor
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'XOPlus',
+        theme: themeProvider.themeData,
+        home: const SplashScreen(),
+      ),
     );
   }
 }
