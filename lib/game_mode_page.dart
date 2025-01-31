@@ -20,17 +20,22 @@ class GameModePageState extends State<GameModePage> {
   bool _isSoundOn = true;
   bool _isVibrationOn = true;
 
+  late SharedPreferences _prefs; // SharedPreferences nesnesi
+
+  Future<void> _initPrefs() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
   @override
   void initState() {
     super.initState();
-    _loadSettings();
+    _initPrefs().then((_) => _loadSettings());
   }
 
   Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _isSoundOn = prefs.getBool('isSoundOn') ?? true;
-      _isVibrationOn = prefs.getBool('isVibrationOn') ?? true;
+      _isSoundOn = _prefs.getBool('isSoundOn') ?? true;
+      _isVibrationOn = _prefs.getBool('isVibrationOn') ?? true;
     });
   }
 
@@ -39,7 +44,7 @@ class GameModePageState extends State<GameModePage> {
       SystemSound.play(SystemSoundType.click);
     }
     if (_isVibrationOn) {
-      HapticFeedback.mediumImpact();
+      HapticFeedback.lightImpact();
     }
   }
 

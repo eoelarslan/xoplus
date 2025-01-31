@@ -30,11 +30,17 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   static const double _cellMargin = 8.0;
   static const double _fontSize = 48.0;
 
+  late SharedPreferences _prefs; // SharedPreferences nesnesi
+
+  Future<void> _initPrefs() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
   @override
   void initState() {
     super.initState();
     _gameModel = GameModel();
-    _loadSettings();
+    _initPrefs().then((_) => _loadSettings());
     
     // Create an animation controller for each cell
     for (int i = 0; i < 9; i++) {
@@ -46,10 +52,9 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _isSoundOn = prefs.getBool('isSoundOn') ?? true;
-      _isVibrationOn = prefs.getBool('isVibrationOn') ?? true;
+      _isSoundOn = _prefs.getBool('isSoundOn') ?? true;
+      _isVibrationOn = _prefs.getBool('isVibrationOn') ?? true;
     });
   }
 
@@ -58,7 +63,7 @@ class GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       SystemSound.play(SystemSoundType.click);
     }
     if (_isVibrationOn) {
-      HapticFeedback.mediumImpact();
+      HapticFeedback.lightImpact();
     }
   }
 
