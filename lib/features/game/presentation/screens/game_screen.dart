@@ -8,10 +8,12 @@ import '../../../../core/widgets/glass_container.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final bool vsAi;
+  final GameMode mode;
 
   const GameScreen({
     super.key,
     required this.vsAi,
+    this.mode = GameMode.classic,
   });
 
   @override
@@ -24,7 +26,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     super.initState();
     // Initialize game on first load
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(gameControllerProvider.notifier).startGame(vsAi: widget.vsAi);
+      ref.read(gameControllerProvider.notifier).startGame(
+        vsAi: widget.vsAi,
+        mode: widget.mode,
+      );
     });
   }
 

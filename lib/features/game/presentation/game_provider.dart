@@ -17,9 +17,9 @@ class GameController extends StateNotifier<GameState> {
 
   GameController(this.ref) : super(GameState.initial());
 
-  void startGame({required bool vsAi}) {
+  void startGame({required bool vsAi, required GameMode mode}) {
     isVsAi = vsAi;
-    state = GameState.initial();
+    state = GameState.initial(mode);
     isAiThinking = false;
   }
 
@@ -38,7 +38,9 @@ class GameController extends StateNotifier<GameState> {
     if (_checkGameOver()) return;
 
     // 3. AI Turn
-    if (isVsAi && state.currentPlayer == Player.o && state.status == GameStatus.playing) {
+    if (isVsAi &&
+        state.currentPlayer == Player.o &&
+        state.status == GameStatus.playing) {
       isAiThinking = true;
       try {
         await Future.delayed(const Duration(milliseconds: 600));
@@ -59,8 +61,19 @@ class GameController extends StateNotifier<GameState> {
   void _performMove(int index) {
     if (state.board[index] != null) return;
 
-    final newBoard = List<Player?>.from(state.board);
+    List<int> currentMoves =
+        state.currentPlayer == Player.x ? [...state.xMoves] : [...state.oMoves];
+    List<Player?> newBoard = List<Player?>.from(state.board);
+
+    // Infinite Shift Logic: Remove oldest move if needed
+    if (state.mode == GameMode.infiniteShift && currentMoves.length >= 3) {
+      final oldMoveIndex = currentMoves.removeAt(0);
+      newBoard[oldMoveIndex] = null;
+    }
+
+    // Place new move
     newBoard[index] = state.currentPlayer;
+    currentMoves.add(index);
 
     // Haptics
     final settings = ref.read(settingsControllerProvider);
@@ -71,12 +84,15 @@ class GameController extends StateNotifier<GameState> {
     state = state.copyWith(
       board: newBoard,
       currentPlayer: state.currentPlayer == Player.x ? Player.o : Player.x,
+      xMoves: state.currentPlayer == Player.x ? currentMoves : state.xMoves,
+      oMoves: state.currentPlayer == Player.o ? currentMoves : state.oMoves,
     );
   }
 
   bool _checkGameOver() {
-    final previousPlayer = state.currentPlayer == Player.x ? Player.o : Player.x;
-    
+    final previousPlayer =
+        state.currentPlayer == Player.x ? Player.o : Player.x;
+
     // Check Win
     final winningLine = GameLogic.checkWin(state.board, previousPlayer);
     if (winningLine != null) {
@@ -89,8 +105,8 @@ class GameController extends StateNotifier<GameState> {
       return true;
     }
 
-    // Check Draw
-    if (GameLogic.isBoardFull(state.board)) {
+    // Check Draw (ONLY for Classic Mode)
+    if (state.mode == GameMode.classic && GameLogic.isBoardFull(state.board)) {
       state = state.copyWith(status: GameStatus.draw);
       _handleGameEnd(winner: null);
       return true;
@@ -114,7 +130,7 @@ class GameController extends StateNotifier<GameState> {
 
     // Record Stats (sadece vsAI)
     if (!isVsAi) return;
-    
+
     if (winner == Player.x) {
       statsNotifier.recordPlayerWin();
     } else if (winner == Player.o) {
@@ -122,10 +138,9 @@ class GameController extends StateNotifier<GameState> {
     } else {
       statsNotifier.recordDraw();
     }
-
   }
 
   void resetGame() {
-    startGame(vsAi: isVsAi);
+    startGame(vsAi: isVsAi, mode: state.mode);
   }
 }

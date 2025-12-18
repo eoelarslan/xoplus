@@ -5,6 +5,8 @@ import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/stats/presentation/screens/stats_screen.dart';
 import '../../features/game/presentation/screens/game_screen.dart';
 
+import '../../features/game/domain/game_types.dart';
+
 class AppRouter {
   // Route paths (tek kaynak)
   static const splash = '/';
@@ -31,9 +33,10 @@ class AppRouter {
       GoRoute(
         path: game,
         builder: (context, state) {
-          final vsAi =
-              (state.extra as Map<String, dynamic>?)?['vsAi'] as bool? ?? false;
-          return GameScreen(vsAi: vsAi);
+          final extras = state.extra as Map<String, dynamic>?;
+          final vsAi = extras?['vsAi'] as bool? ?? false;
+          final mode = extras?['mode'] as GameMode? ?? GameMode.classic;
+          return GameScreen(vsAi: vsAi, mode: mode);
         },
       ),
       GoRoute(

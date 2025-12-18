@@ -7,12 +7,14 @@ class GameCell extends StatelessWidget {
   final Player? player;
   final VoidCallback onTap;
   final bool isWinningCell;
+  final bool isFaded;
 
   const GameCell({
     super.key,
     required this.player,
     required this.onTap,
     this.isWinningCell = false,
+    this.isFaded = false,
   });
 
   @override
@@ -36,7 +38,12 @@ class GameCell extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     final isX = player == Player.x;
 
-    final color = isX ? cs.secondary : cs.tertiary;
+    Color color = isX ? cs.secondary : cs.tertiary;
+
+    if (isFaded) {
+      color = color.withValues(alpha: 0.4);
+    }
+
     final icon = isX ? Icons.close : Icons.circle_outlined;
 
     return Icon(
