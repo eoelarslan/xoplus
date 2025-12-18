@@ -49,6 +49,9 @@ class GameController extends StateNotifier<GameState> {
         final bestMove = GameLogic.getBestMove(
           List<Player?>.from(state.board),
           Player.o,
+          mode: state.mode,
+          xMoves: List<int>.from(state.xMoves),
+          oMoves: List<int>.from(state.oMoves),
         );
         _performMove(bestMove);
         _checkGameOver();
