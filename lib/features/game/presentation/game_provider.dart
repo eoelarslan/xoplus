@@ -40,14 +40,19 @@ class GameController extends StateNotifier<GameState> {
     // 3. AI Turn
     if (isVsAi && state.currentPlayer == Player.o && state.status == GameStatus.playing) {
       isAiThinking = true;
-      // Small delay for realism
-      await Future.delayed(const Duration(milliseconds: 600));
-      if (!mounted) return;
-      
-      final bestMove = GameLogic.getBestMove(state.board, Player.o);
-      _performMove(bestMove);
-      _checkGameOver();
-      isAiThinking = false;
+      try {
+        await Future.delayed(const Duration(milliseconds: 600));
+        if (!mounted) return;
+
+        final bestMove = GameLogic.getBestMove(
+          List<Player?>.from(state.board),
+          Player.o,
+        );
+        _performMove(bestMove);
+        _checkGameOver();
+      } finally {
+        isAiThinking = false;
+      }
     }
   }
 
@@ -107,27 +112,17 @@ class GameController extends StateNotifier<GameState> {
       }
     }
 
-    // Record Stats
+    // Record Stats (sadece vsAI)
+    if (!isVsAi) return;
+    
     if (winner == Player.x) {
       statsNotifier.recordPlayerWin();
     } else if (winner == Player.o) {
-      // In PvP 'O' is also a player, but for stats simplicity let's assume P1 is always tracked
-      // If VsAI, O is AI. if PvP, it's just a "loss" for P1 stats perspective or we can separate PvP stats.
-      // Requirement said "Play vs Player" and "Play vs AI".
-      // Stats requirement: "wins, losses, draws for the local user".
-      // Usually in PvP on same device, stats might be confusing. 
-      // Let's count PvP wins for X as Player Wins? Or just disable stats for PvP?
-      // For now, if VsAI: Winner O = Loss. 
-      // If PvP: Let's just track X wins as "Wins". O wins as "Losses" is weird.
-      // Let's only track stats for VsAI mode to be clean, or count X as "Player 1".
-      if (isVsAi) {
-        statsNotifier.recordAiWin();
-      }
+      statsNotifier.recordAiWin();
     } else {
-      if (isVsAi) {
-        statsNotifier.recordDraw();
-      }
+      statsNotifier.recordDraw();
     }
+
   }
 
   void resetGame() {

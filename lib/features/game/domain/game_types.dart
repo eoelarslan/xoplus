@@ -3,6 +3,8 @@ enum Player { x, o }
 enum GameStatus { playing, draw, win }
 
 class GameState {
+  static const _unset = Object();
+
   final List<Player?> board;
   final Player currentPlayer;
   final GameStatus status;
@@ -30,14 +32,17 @@ class GameState {
     Player? currentPlayer,
     GameStatus? status,
     Player? winner,
-    List<int>? winningLine,
+    Object? winningLine = _unset,
   }) {
     return GameState(
       board: board ?? this.board,
       currentPlayer: currentPlayer ?? this.currentPlayer,
       status: status ?? this.status,
       winner: winner ?? this.winner,
-      winningLine: winningLine ?? this.winningLine,
+      winningLine: identical(winningLine, _unset)
+          ? this.winningLine
+          : winningLine as List<int>?,
     );
   }
 }
+

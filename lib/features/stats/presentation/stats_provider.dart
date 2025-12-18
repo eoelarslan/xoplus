@@ -23,7 +23,9 @@ class StatsController extends StateNotifier<StatsEntity> {
   }
 
   Future<void> _loadStats() async {
-    state = await _repository.loadStats();
+    final loaded = await _repository.loadStats();
+    if (!mounted) return;
+    state = loaded;
   }
 
   Future<void> recordPlayerWin() async {

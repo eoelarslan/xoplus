@@ -19,18 +19,22 @@ class GlassContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = borderRadius ?? BorderRadius.circular(20);
+    final effectiveOpacity = opacity.clamp(0.0, 1.0);
+
+    final cs = Theme.of(context).colorScheme;
+    final borderColor = cs.outline.withValues(alpha: 0.12);
+
     return ClipRRect(
-      borderRadius: borderRadius ?? BorderRadius.circular(20),
+      borderRadius: radius,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withOpacity(opacity),
-            borderRadius: borderRadius ?? BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1),
-            ),
+            color: cs.surface.withValues(alpha: effectiveOpacity),
+            borderRadius: radius,
+            border: Border.all(color: borderColor),
           ),
           child: child,
         ),

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/widgets/glass_container.dart';
 import '../../../../core/widgets/primary_button.dart';
-import 'stats_provider.dart';
+import '../stats_provider.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -12,6 +12,7 @@ class StatsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final stats = ref.watch(statsControllerProvider);
     final controller = ref.read(statsControllerProvider.notifier);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text("Stats")),
@@ -23,23 +24,23 @@ class StatsScreen extends ConsumerWidget {
               "Your Performance",
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+                    color: cs.primary,
                   ),
             ).animate().fadeIn().slideY(begin: -0.2, end: 0),
             const SizedBox(height: 32),
             Row(
               children: [
-                Expanded(child: _buildStatCard(context, "Wins", stats.playerWins.toString(), Colors.green)),
+                Expanded(child: _buildStatCard(context, "Wins", stats.playerWins.toString(), cs.primary)),
                 const SizedBox(width: 16),
-                Expanded(child: _buildStatCard(context, "Losses", stats.aiWins.toString(), Colors.red)),
+                Expanded(child: _buildStatCard(context, "Losses", stats.aiWins.toString(), cs.error)),
               ],
             ),
             const SizedBox(height: 16),
              Row(
               children: [
-                Expanded(child: _buildStatCard(context, "Draws", stats.draws.toString(), Colors.orange)),
+                Expanded(child: _buildStatCard(context, "Draws", stats.draws.toString(), cs.secondary)),
                 const SizedBox(width: 16),
-                Expanded(child: _buildStatCard(context, "Total", stats.totalGames.toString(), Colors.blue)),
+                Expanded(child: _buildStatCard(context, "Total", stats.totalGames.toString(), cs.tertiary)),
               ],
             ),
             const Spacer(),
@@ -62,7 +63,12 @@ class StatsScreen extends ConsumerWidget {
                           controller.resetStats();
                           Navigator.pop(context);
                         },
-                        child: const Text("Reset", style: TextStyle(color: Colors.red)),
+                        child: Text(
+                          "Reset",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -94,7 +100,7 @@ class StatsScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6),
+              color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.6),
             ),
           ),
         ],

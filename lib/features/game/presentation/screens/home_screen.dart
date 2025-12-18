@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xoplus/core/widgets/primary_button.dart';
+import '../../../../core/router/app_router.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -15,13 +16,13 @@ class HomeScreen extends StatelessWidget {
           children: [
             PrimaryButton(
               label: "Play vs Player",
-              onPressed: () => GoRouter.of(context).push('/game', extra: {'vsAi': false}),
+              onPressed: () => context.push(AppRouter.game, extra: {'vsAi': false}),
               icon: Icons.person,
             ),
             const SizedBox(height: 20),
             PrimaryButton(
               label: "Play vs AI",
-              onPressed: () => GoRouter.of(context).push('/game', extra: {'vsAi': true}),
+              onPressed: () => context.push(AppRouter.game, extra: {'vsAi': true}),
               icon: Icons.computer,
             ),
             const SizedBox(height: 20),
@@ -30,13 +31,13 @@ class HomeScreen extends StatelessWidget {
               children: [
                 PrimaryButton(
                   label: "Stats",
-                  onPressed: () => GoRouter.of(context).push('/stats'),
+                  onPressed: () => context.push(AppRouter.stats),
                   icon: Icons.bar_chart,
                 ),
                 const SizedBox(width: 16),
                 PrimaryButton(
                   label: "Settings",
-                  onPressed: () => GoRouter.of(context).push('/settings'),
+                  onPressed: () => context.push(AppRouter.settings),
                   icon: Icons.settings,
                 ),
               ],

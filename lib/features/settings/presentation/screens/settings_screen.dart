@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'settings_provider.dart';
+import '../settings_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -19,29 +19,34 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           _buildSectionHeader(context, "Appearance"),
           Card(
-            child: Column(
-              children: [
-                RadioListTile<ThemeMode>(
-                  title: const Text("System Default"),
-                  value: ThemeMode.system,
-                  groupValue: settings.themeMode,
-                  onChanged: (val) => controller.toggleTheme(val!),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: RadioGroup<ThemeMode>(
+                groupValue: settings.themeMode,
+                onChanged: (val) {
+                  if (val == null) return;
+                  controller.toggleTheme(val);
+                },
+                child: Column(
+                  children: const [
+                    RadioListTile<ThemeMode>(
+                      title: Text("System Default"),
+                      value: ThemeMode.system,
+                    ),
+                    RadioListTile<ThemeMode>(
+                      title: Text("Light Mode"),
+                      value: ThemeMode.light,
+                    ),
+                    RadioListTile<ThemeMode>(
+                      title: Text("Dark Mode"),
+                      value: ThemeMode.dark,
+                    ),
+                  ],
                 ),
-                RadioListTile<ThemeMode>(
-                  title: const Text("Light Mode"),
-                  value: ThemeMode.light,
-                  groupValue: settings.themeMode,
-                  onChanged: (val) => controller.toggleTheme(val!),
-                ),
-                RadioListTile<ThemeMode>(
-                  title: const Text("Dark Mode"),
-                  value: ThemeMode.dark,
-                  groupValue: settings.themeMode,
-                  onChanged: (val) => controller.toggleTheme(val!),
-                ),
-              ],
+              ),
             ),
           ),
+
           const SizedBox(height: 24),
           _buildSectionHeader(context, "Gameplay"),
           Card(
@@ -53,7 +58,10 @@ class SettingsScreen extends ConsumerWidget {
                   value: settings.isSoundEnabled,
                   onChanged: (val) => controller.toggleSound(val),
                 ),
-                const Divider(height: 1),
+                Divider(
+                  height: 1,
+                  color: Theme.of(context).dividerColor,
+                ),
                 SwitchListTile(
                   title: const Text("Haptic Feedback"),
                   subtitle: const Text("Vibrate on moves and win"),
@@ -75,7 +83,7 @@ class SettingsScreen extends ConsumerWidget {
         title,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).colorScheme.primary,
             ),
       ),
     );

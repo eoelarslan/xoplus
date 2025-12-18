@@ -80,7 +80,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                           : "It's a Draw!",
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: 20),

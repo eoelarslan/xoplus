@@ -33,16 +33,18 @@ class GameCell extends StatelessWidget {
   Widget? _buildMark(BuildContext context) {
     if (player == null) return null;
 
+    final cs = Theme.of(context).colorScheme;
     final isX = player == Player.x;
-    final color = isX ? const Color(0xFF03DAC6) : const Color(0xFFCF6679);
+
+    final color = isX ? cs.secondary : cs.tertiary;
     final icon = isX ? Icons.close : Icons.circle_outlined;
 
     return Icon(
       icon,
       size: 64,
-      color: isWinningCell ? Colors.white : color,
+      color: color,
     )
-        .animate(key: ValueKey(player)) // Re-animate if player changes (shouldn't happen in normal flow)
+        .animate(key: ValueKey(player))
         .scale(duration: 400.ms, curve: Curves.easeOutBack)
         .fadeIn(duration: 300.ms);
   }

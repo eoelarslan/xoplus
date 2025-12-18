@@ -36,21 +36,38 @@ class SettingsController extends StateNotifier<SettingsEntity> {
   }
 
   Future<void> _loadSettings() async {
-    state = await _repository.loadSettings();
+    final loaded = await _repository.loadSettings();
+    if (!mounted) return;
+    state = loaded;
   }
 
   Future<void> toggleTheme(ThemeMode mode) async {
+    final prev = state;
     state = state.copyWith(themeMode: mode);
-    await _repository.saveThemeMode(mode);
+    try {
+      await _repository.saveThemeMode(mode);
+    } catch (_) {
+      state = prev;
+    }
   }
 
   Future<void> toggleSound(bool enabled) async {
+    final prev = state;
     state = state.copyWith(isSoundEnabled: enabled);
-    await _repository.saveSoundEnabled(enabled);
+    try {
+      await _repository.saveSoundEnabled(enabled);
+    } catch (_) {
+      state = prev;
+    }
   }
 
   Future<void> toggleHaptics(bool enabled) async {
+    final prev = state;
     state = state.copyWith(isHapticsEnabled: enabled);
-    await _repository.saveHapticsEnabled(enabled);
+    try {
+      await _repository.saveHapticsEnabled(enabled);
+    } catch (_) {
+      state = prev;
+    }
   }
 }

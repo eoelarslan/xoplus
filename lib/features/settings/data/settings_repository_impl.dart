@@ -18,8 +18,12 @@ class SettingsRepositoryImpl implements SettingsRepository {
     final soundEnabled = _prefs.getBool(_keySoundEnabled) ?? true;
     final hapticsEnabled = _prefs.getBool(_keyHapticsEnabled) ?? true;
 
+    final safeIndex = (themeIndex >= 0 && themeIndex < ThemeMode.values.length)
+        ? themeIndex
+        : ThemeMode.system.index;
+
     return SettingsEntity(
-      themeMode: ThemeMode.values[themeIndex],
+      themeMode: ThemeMode.values[safeIndex],
       isSoundEnabled: soundEnabled,
       isHapticsEnabled: hapticsEnabled,
     );
