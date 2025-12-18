@@ -113,6 +113,10 @@ class GameLogic {
     List<int> xMoves,
     List<int> oMoves,
   ) {
+    final availableSpots = board.where((space) => space == null).length;
+    // Limit search depth to avoid long think times when the board keeps shifting.
+    final maxDepth = max(4, min(6, availableSpots + 3));
+
     int bestScore = -1000;
     int move = -1;
 
@@ -136,6 +140,7 @@ class GameLogic {
         aiPlayer,
         aiPlayer == Player.x ? simulation.updatedMoves : previousOpponentMoves,
         aiPlayer == Player.x ? previousOpponentMoves : simulation.updatedMoves,
+        maxDepth: maxDepth,
       );
 
       if (score > bestScore) {
@@ -160,7 +165,7 @@ class GameLogic {
     Player aiPlayer,
     List<int> xMoves,
     List<int> oMoves, {
-    int maxDepth = 8,
+    required int maxDepth,
   }) {
     final opponent = aiPlayer == Player.x ? Player.o : Player.x;
 
