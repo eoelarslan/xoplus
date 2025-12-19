@@ -5,6 +5,20 @@ import 'package:xoplus/features/settings/presentation/settings_provider.dart';
 import '../domain/game_types.dart';
 import '../domain/game_logic.dart';
 
+typedef BestMoveResolver = int Function(
+  List<Player?> board,
+  Player aiPlayer, {
+  required GameMode mode,
+  required List<int> xMoves,
+  required List<int> oMoves,
+});
+
+final bestMoveResolverProvider =
+    Provider<BestMoveResolver>((ref) => GameLogic.getBestMove);
+
+final aiMoveDelayProvider =
+    Provider<Duration>((ref) => const Duration(milliseconds: 600));
+
 final gameControllerProvider =
     StateNotifierProvider<GameController, GameState>((ref) {
   return GameController(ref);
@@ -25,14 +39,13 @@ class GameController extends StateNotifier<GameState> {
 
   Future<void> makeMove(int index) async {
     // Basic validation
-    if (state.board[index] != null ||
-        state.status != GameStatus.playing ||
-        isAiThinking) {
+    if (state.status != GameStatus.playing || isAiThinking) {
       return;
     }
 
     // 1. Player Move
-    _performMove(index);
+    final performed = _performMove(index);
+    if (!performed) return;
 
     // 2. Check Game Over
     if (_checkGameOver()) return;
@@ -43,23 +56,30 @@ class GameController extends StateNotifier<GameState> {
         state.status == GameStatus.playing) {
       isAiThinking = true;
       try {
-        await Future.delayed(const Duration(milliseconds: 600));
+        final aiDelay = ref.read(aiMoveDelayProvider);
+        await Future.delayed(aiDelay);
         if (!mounted) return;
 
-        final bestMove = GameLogic.getBestMove(
+        final resolveBestMove = ref.read(bestMoveResolverProvider);
+        final bestMove = resolveBestMove(
           List<Player?>.from(state.board),
           Player.o,
+          mode: state.mode,
+          xMoves: List<int>.from(state.xMoves),
+          oMoves: List<int>.from(state.oMoves),
         );
-        _performMove(bestMove);
-        _checkGameOver();
+        final aiMoved = _performMove(bestMove);
+        if (aiMoved) {
+          _checkGameOver();
+        }
       } finally {
         isAiThinking = false;
       }
     }
   }
 
-  void _performMove(int index) {
-    if (state.board[index] != null) return;
+  bool _performMove(int index) {
+    if (state.status != GameStatus.playing) return false;
 
     List<int> currentMoves =
         state.currentPlayer == Player.x ? [...state.xMoves] : [...state.oMoves];
@@ -70,6 +90,8 @@ class GameController extends StateNotifier<GameState> {
       final oldMoveIndex = currentMoves.removeAt(0);
       newBoard[oldMoveIndex] = null;
     }
+
+    if (newBoard[index] != null) return false;
 
     // Place new move
     newBoard[index] = state.currentPlayer;
@@ -87,6 +109,8 @@ class GameController extends StateNotifier<GameState> {
       xMoves: state.currentPlayer == Player.x ? currentMoves : state.xMoves,
       oMoves: state.currentPlayer == Player.o ? currentMoves : state.oMoves,
     );
+
+    return true;
   }
 
   bool _checkGameOver() {
